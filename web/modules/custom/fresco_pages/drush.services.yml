@@ -1,0 +1,12 @@
+services:
+  fresco_pages.commands:
+    class: Drupal\fresco_pages\Drush\Commands\FrescoPagesCommands
+    arguments:
+      - '@fresco_pages.publisher'
+      - '@fresco_pages.site_assembler'
+      - '@fresco_pages.artifact_writer'
+      - '@fresco_pages.local_tree_inspector'
+      - '@fresco_pages.drift_analyzer'
+      - '@fresco_pages.github_preflight'
+    tags:
+      - { name: drush.command }

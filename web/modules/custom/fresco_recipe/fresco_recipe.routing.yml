@@ -1,0 +1,88 @@
+fresco_recipe.dashboard:
+  path: '/dashboard'
+  defaults:
+    _controller: '\Drupal\fresco_recipe\Controller\RecipeDashboardController::dashboard'
+    _title: 'Recipe dashboard'
+  requirements:
+    _permission: 'access fresco dashboard'
+
+fresco_recipe.library:
+  path: '/library'
+  defaults:
+    _controller: '\Drupal\fresco_recipe\Controller\RecipeDashboardController::library'
+    _title: 'Recipe library'
+  requirements:
+    _permission: 'access fresco dashboard'
+
+fresco_recipe.generator:
+  path: '/generator'
+  defaults:
+    _form: '\Drupal\fresco_recipe\Form\RecipeGeneratorForm'
+    _title: 'Recipe generator'
+  requirements:
+    _permission: 'generate fresco recipes'
+
+fresco_recipe.edit:
+  path: '/recipes/{node}/edit'
+  defaults:
+    _form: '\Drupal\fresco_recipe\Form\RecipeEditorForm'
+    _title: 'Edit recipe'
+  requirements:
+    _entity_access: 'node.update'
+    node: '\d+'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+fresco_recipe.publish:
+  path: '/recipes/{node}/publish'
+  defaults:
+    _form: '\Drupal\fresco_recipe\Form\RecipePublishForm'
+    _title: 'Publish recipe'
+  requirements:
+    _entity_access: 'node.update'
+    node: '\d+'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+fresco_recipe.save_as_new:
+  path: '/recipes/{node}/save-as-new'
+  defaults:
+    _form: '\Drupal\fresco_recipe\Form\RecipeSaveAsNewForm'
+    _title: 'Save as new recipe'
+  requirements:
+    _entity_access: 'node.update'
+    node: '\d+'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+fresco_recipe.export:
+  path: '/recipes/{node}/export/{format}'
+  defaults:
+    _controller: '\Drupal\fresco_recipe\Controller\RecipeExportController::export'
+  requirements:
+    _entity_access: 'node.view'
+    _permission: 'export fresco recipes'
+    node: '\d+'
+    format: 'json|markdown|html|pdf|svg'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+fresco_recipe.image:
+  path: '/recipes/{node}/image.svg'
+  defaults:
+    _controller: '\Drupal\fresco_recipe\Controller\RecipeImageController::image'
+  requirements:
+    _entity_access: 'node.view'
+    node: '\d+'
+  options:
+    parameters:
+      node:
+        type: entity:node

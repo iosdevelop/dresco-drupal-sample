@@ -1,0 +1,9 @@
+name: Dresco Legacy Import
+type: module
+description: Repeatable read-only migration from the legacy Fresco SQLite application.
+package: Dresco
+core_version_requirement: ^11
+dependencies:
+  - drupal:migrate
+  - drupal:node
+  - fresco_recipe:fresco_recipe

@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * @file
+ * Theme hooks for Dresco recipe application pages.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
+use Drupal\fresco_pages\Entity\Publication;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_theme().
+ *
+ * @phpstan-return array<string, array<string, mixed>>
+ */
+function fresco_recipe_theme(): array {
+  return [
+    'fresco_recipe_dashboard' => [
+      'variables' => [
+        'recipes' => [],
+        'recipe_count' => 0,
+      ],
+    ],
+    'fresco_recipe_library' => [
+      'variables' => [
+        'recipes' => [],
+        'query' => '',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ *
+ * @phpstan-param array<string, mixed> $build
+ */
+function fresco_recipe_node_view(array &$build, NodeInterface $entity, EntityViewDisplayInterface $display, string $viewMode): void {
+  if ($entity->bundle() !== 'recipe') {
+    return;
+  }
+  /** @var \Drupal\fresco_recipe\Mapper\RecipeNodeMapper $mapper */
+  $mapper = \Drupal::service('fresco_recipe.node_mapper');
+  $recipe = $mapper->fromNode($entity);
+  $publicUrl = fresco_recipe_live_pages_url($entity);
+  $schema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Recipe',
+    'name' => $recipe->title,
+    'description' => $recipe->description,
+    'url' => $publicUrl !== '' ? $publicUrl : $entity->toUrl('canonical', ['absolute' => TRUE])->toString(),
+    'prepTime' => 'PT' . $recipe->prepTimeMinutes . 'M',
+    'cookTime' => 'PT' . $recipe->cookTimeMinutes . 'M',
+    'totalTime' => 'PT' . ($recipe->prepTimeMinutes + $recipe->cookTimeMinutes) . 'M',
+    'recipeYield' => (string) $recipe->servings,
+    'recipeCuisine' => $recipe->cuisine,
+    'recipeCategory' => $recipe->category,
+    'recipeIngredient' => array_map(
+      static fn (array $ingredient): string => (string) ($ingredient['original_text'] ?? $ingredient['food'] ?? ''),
+      $recipe->ingredients,
+    ),
+    'recipeInstructions' => array_map(
+      static fn (array $instruction): array => [
+        '@type' => 'HowToStep',
+        'text' => (string) ($instruction['text'] ?? ''),
+      ],
+      $recipe->instructions,
+    ),
+    'nutrition' => [
+      '@type' => 'NutritionInformation',
+      'calories' => $recipe->nutrition['calories'] ?? NULL,
+      'proteinContent' => $recipe->nutrition['protein'] ?? NULL,
+      'fiberContent' => $recipe->nutrition['fiber'] ?? NULL,
+    ],
+    'image' => Url::fromRoute('fresco_recipe.image', ['node' => $entity->id()], ['absolute' => TRUE])->toString(),
+  ];
+  $schemaJson = json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+  $build['#attached']['html_head'][] = [
+    [
+      '#tag' => 'script',
+      '#attributes' => ['type' => 'application/ld+json'],
+      '#value' => Markup::create($schemaJson),
+    ],
+    'fresco_recipe_schema_' . $entity->id(),
+  ];
+  $build['#cache']['tags'][] = 'fresco_publication_list';
+}
+
+/**
+ * Returns a GitHub Pages URL only when it is known to be live.
+ */
+function fresco_recipe_live_pages_url(NodeInterface $node): string {
+  $entityTypeManager = \Drupal::entityTypeManager();
+  if (!$entityTypeManager->hasDefinition('fresco_publication')) {
+    return trim((string) $node->get('field_pages_url')->value);
+  }
+
+  $storage = $entityTypeManager->getStorage('fresco_publication');
+  $ids = $storage->getQuery()
+    ->accessCheck(FALSE)
+    ->condition('recipe', $node->id())
+    ->sort('created', 'DESC')
+    ->range(0, 1)
+    ->execute();
+  if ($ids !== []) {
+    $publication = $storage->load(reset($ids));
+    if ($publication instanceof Publication && (string) $publication->get('state')->value === 'published') {
+      return trim((string) $publication->get('public_url')->value);
+    }
+    return '';
+  }
+
+  return trim((string) $node->get('field_pages_url')->value);
+}

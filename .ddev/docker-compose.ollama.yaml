@@ -1,0 +1,21 @@
+# Local Ollama service for Dresco AI generation and photo recognition.
+# Reachable from the web container at http://ollama:11434.
+services:
+  ollama:
+    container_name: ddev-${DDEV_SITENAME}-ollama
+    image: ollama/ollama:latest
+    restart: "no"
+    expose:
+      - "11434"
+    environment:
+      - OLLAMA_KEEP_ALIVE=30m
+    volumes:
+      - ollama-models:/root/.ollama
+      - ".:/mnt/ddev_config"
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+volumes:
+  ollama-models:
+    # Named explicitly so models survive project renames.
+    name: dresco-ollama-models

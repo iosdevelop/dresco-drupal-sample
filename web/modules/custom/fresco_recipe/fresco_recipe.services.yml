@@ -1,0 +1,55 @@
+services:
+  fresco_recipe.contract_factory:
+    class: Drupal\fresco_recipe\Value\RecipeContractFactory
+
+  fresco_recipe.node_mapper:
+    class: Drupal\fresco_recipe\Mapper\RecipeNodeMapper
+    arguments: ['@fresco_recipe.contract_factory']
+
+  fresco_recipe.svg_builder:
+    class: Drupal\fresco_recipe\Service\RecipeSvgBuilder
+
+  fresco_recipe.validator:
+    class: Drupal\fresco_recipe\Validation\RecipeValidator
+    arguments: [!tagged_iterator fresco_recipe.validation_rule]
+
+  fresco_recipe.validation_rule.required:
+    class: Drupal\fresco_recipe\Validation\Rule\RequiredSectionsRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.vegan:
+    class: Drupal\fresco_recipe\Validation\Rule\VeganRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.savory_limits:
+    class: Drupal\fresco_recipe\Validation\Rule\SavoryLimitsRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.flavor_structure:
+    class: Drupal\fresco_recipe\Validation\Rule\FlavorStructureRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.seasoning_density:
+    class: Drupal\fresco_recipe\Validation\Rule\SeasoningDensityRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.technical_safety:
+    class: Drupal\fresco_recipe\Validation\Rule\TechnicalSafetyRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.validation_rule.instruction_clarity:
+    class: Drupal\fresco_recipe\Validation\Rule\InstructionClarityRule
+    tags:
+      - { name: fresco_recipe.validation_rule }
+
+  fresco_recipe.anonymous_access_denied_subscriber:
+    class: Drupal\fresco_recipe\EventSubscriber\AnonymousAccessDeniedSubscriber
+    arguments: ['@current_user', '@redirect.destination']
+    tags:
+      - { name: event_subscriber }

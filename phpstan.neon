@@ -1,0 +1,8 @@
+parameters:
+  level: 6
+  paths:
+    - web/modules/custom
+  excludePaths:
+    analyse:
+      - web/modules/custom/*/tests/fixtures/*
+  tmpDir: .phpstan.cache

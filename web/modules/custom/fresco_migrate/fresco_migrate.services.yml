@@ -1,0 +1,20 @@
+services:
+  fresco_migrate.legacy_recipe_parity_reporter:
+    class: Drupal\fresco_migrate\Service\LegacyRecipeParityReporter
+    arguments: ['@entity_type.manager']
+
+  fresco_migrate.legacy_recipe_import_runner:
+    class: Drupal\fresco_migrate\Service\LegacyRecipeImportRunner
+    arguments: ['@plugin.manager.migration']
+
+  fresco_migrate.legacy_recipe_image_migrator:
+    class: Drupal\fresco_migrate\Service\LegacyRecipeImageMigrator
+    arguments: ['@entity_type.manager', '@http_client', '@file_system', '@fresco_recipe.svg_builder']
+
+  fresco_migrate.legacy_recipe_rehearsal_reporter:
+    class: Drupal\fresco_migrate\Service\LegacyRecipeRehearsalReporter
+    arguments: ['@entity_type.manager', '@fresco_migrate.legacy_recipe_parity_reporter']
+
+  fresco_migrate.legacy_recipe_rollback_reporter:
+    class: Drupal\fresco_migrate\Service\LegacyRecipeRollbackReporter
+    arguments: ['@entity_type.manager']

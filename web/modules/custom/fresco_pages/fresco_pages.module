@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Hooks for immutable Dresco Pages publication.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_entity_insert().
+ */
+function fresco_pages_entity_insert(EntityInterface $entity): void {
+  _fresco_pages_queue_published_recipe($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function fresco_pages_entity_update(EntityInterface $entity): void {
+  _fresco_pages_queue_published_recipe($entity);
+}
+
+/**
+ * Implements hook_entity_predelete().
+ */
+function fresco_pages_entity_predelete(EntityInterface $entity): void {
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+
+  \Drupal::service('fresco_pages.recipe_deletion_guard')->predelete($entity);
+}
+
+/**
+ * Queues each published recipe revision exactly once per content hash.
+ */
+function _fresco_pages_queue_published_recipe(EntityInterface $entity): void {
+  if (!$entity instanceof NodeInterface || $entity->bundle() !== 'recipe' || !$entity->isPublished()) {
+    return;
+  }
+  try {
+    /** @var \Drupal\fresco_pages\Service\PagesPublisherInterface $publisher */
+    $publisher = \Drupal::service('fresco_pages.publisher');
+    $publisher->queue((int) $entity->id(), (int) $entity->getRevisionId());
+  }
+  catch (\Throwable $exception) {
+    \Drupal::logger('fresco_pages')->error('Could not queue recipe {recipe} revision {revision}: {message}', [
+      'recipe' => $entity->id(),
+      'revision' => $entity->getRevisionId(),
+      'message' => $exception->getMessage(),
+    ]);
+  }
+}

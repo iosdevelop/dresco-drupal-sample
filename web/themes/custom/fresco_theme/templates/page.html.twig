@@ -1,0 +1,19 @@
+<div class="layout-container">
+  <header role="banner">
+    <nav class="fresco-nav" aria-label="{{ 'Primary navigation'|t }}">
+      <a class="fresco-brand" href="{{ path('fresco_recipe.dashboard') }}"><img src="{{ base_path ~ directory }}/logo.svg" alt="" width="32" height="32">Dresco</a>
+      <div>
+        <a href="{{ path('fresco_recipe.dashboard') }}">{{ 'Dashboard'|t }}</a>
+        <a href="{{ path('fresco_recipe.library') }}">{{ 'Library'|t }}</a>
+        <a href="{{ path('fresco_recipe.generator') }}">{{ 'Generate'|t }}</a>
+        {% if logged_in %}<a href="{{ path('user.page') }}">{{ 'Account'|t }}</a>{% endif %}
+      </div>
+    </nav>
+  </header>
+  <main id="main-content">
+    {{ page.content }}
+  </main>
+  <footer>
+    {{ page.footer }}
+  </footer>
+</div>

@@ -1,0 +1,5 @@
+fresco_ai.settings:
+  title: 'Dresco AI'
+  description: 'Configure recipe generation providers and models.'
+  route_name: fresco_ai.settings
+  parent: system.admin_config_services

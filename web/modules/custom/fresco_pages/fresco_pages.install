@@ -1,0 +1,182 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for Dresco Pages.
+ */
+
+declare(strict_types=1);
+
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function fresco_pages_install(): void {
+  _fresco_pages_ensure_config();
+  _fresco_pages_grant_permissions();
+}
+
+/**
+ * Installs durable publication storage and default settings.
+ */
+function fresco_pages_update_11001(): string {
+  $updateManager = \Drupal::entityDefinitionUpdateManager();
+  if ($updateManager->getEntityType('fresco_publication') === NULL) {
+    $updateManager->installEntityType(\Drupal::entityTypeManager()->getDefinition('fresco_publication'));
+  }
+  _fresco_pages_ensure_config();
+  _fresco_pages_grant_permissions();
+  return 'Installed Fresco Pages publication records and settings.';
+}
+
+/**
+ * Expands publication transport identifiers beyond raw Git SHAs.
+ */
+function fresco_pages_update_11002(): string {
+  $definition = \Drupal::service('entity_field.manager')
+    ->getFieldStorageDefinitions('fresco_publication')['commit_sha'];
+  \Drupal::entityDefinitionUpdateManager()->updateFieldStorageDefinition($definition);
+  return 'Expanded Fresco Pages transport identifier storage.';
+}
+
+/**
+ * Adds explicit publish/archive operation records.
+ */
+function fresco_pages_update_11003(): string {
+  $fieldManager = \Drupal::service('entity_field.manager');
+  $definitions = $fieldManager->getFieldStorageDefinitions('fresco_publication');
+  $installedDefinitions = \Drupal::service('entity.last_installed_schema.repository')
+    ->getLastInstalledFieldStorageDefinitions('fresco_publication');
+  $updateManager = \Drupal::entityDefinitionUpdateManager();
+
+  if (!isset($installedDefinitions['operation'])) {
+    $updateManager->installFieldStorageDefinition(
+      'operation',
+      'fresco_publication',
+      'fresco_pages',
+      $definitions['operation'],
+    );
+  }
+  else {
+    $updateManager->updateFieldStorageDefinition($definitions['operation']);
+  }
+
+  $updateManager->updateFieldStorageDefinition($definitions['state']);
+  _fresco_pages_backfill_publication_operations();
+  return 'Added Fresco Pages archive publication operations.';
+}
+
+/**
+ * Backfills operation values on records created before archive support.
+ */
+function fresco_pages_update_11004(): string {
+  _fresco_pages_backfill_publication_operations();
+  return 'Backfilled Fresco Pages publication operations.';
+}
+
+/**
+ * Adds publication correlation IDs for log and commit tracing.
+ */
+function fresco_pages_update_11005(): string {
+  $fieldManager = \Drupal::service('entity_field.manager');
+  $definitions = $fieldManager->getFieldStorageDefinitions('fresco_publication');
+  $installedDefinitions = \Drupal::service('entity.last_installed_schema.repository')
+    ->getLastInstalledFieldStorageDefinitions('fresco_publication');
+  if (!isset($installedDefinitions['correlation_id'])) {
+    \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition(
+      'correlation_id',
+      'fresco_publication',
+      'fresco_pages',
+      $definitions['correlation_id'],
+    );
+  }
+  _fresco_pages_backfill_publication_correlation_ids();
+  return 'Added Fresco Pages publication correlation IDs.';
+}
+
+/**
+ * Backfills readable correlation IDs for legacy publication records.
+ */
+function _fresco_pages_backfill_publication_correlation_ids(): void {
+  $connection = \Drupal::database();
+  if (!$connection->schema()->fieldExists('fresco_publication', 'correlation_id')) {
+    return;
+  }
+  $records = $connection->select('fresco_publication', 'p')
+    ->fields('p', ['id', 'content_hash', 'correlation_id'])
+    ->isNull('correlation_id')
+    ->execute();
+  foreach ($records as $record) {
+    $connection->update('fresco_publication')
+      ->fields([
+        'correlation_id' => 'fp-' . $record->id . '-' . substr((string) $record->content_hash, 0, 12),
+      ])
+      ->condition('id', $record->id)
+      ->execute();
+  }
+  $records = $connection->select('fresco_publication', 'p')
+    ->fields('p', ['id', 'content_hash', 'correlation_id'])
+    ->condition('correlation_id', '')
+    ->execute();
+  foreach ($records as $record) {
+    $connection->update('fresco_publication')
+      ->fields([
+        'correlation_id' => 'fp-' . $record->id . '-' . substr((string) $record->content_hash, 0, 12),
+      ])
+      ->condition('id', $record->id)
+      ->execute();
+  }
+}
+
+/**
+ * Marks legacy publication records as publish operations.
+ */
+function _fresco_pages_backfill_publication_operations(): void {
+  $connection = \Drupal::database();
+  if (!$connection->schema()->fieldExists('fresco_publication', 'operation')) {
+    return;
+  }
+  $connection->update('fresco_publication')
+    ->fields(['operation' => 'publish'])
+    ->isNull('operation')
+    ->execute();
+  $connection->update('fresco_publication')
+    ->fields(['operation' => 'publish'])
+    ->condition('operation', '')
+    ->execute();
+}
+
+/**
+ * Adds settings that are absent on an existing installation.
+ */
+function _fresco_pages_ensure_config(): void {
+  $config = \Drupal::configFactory()->getEditable('fresco_pages.settings');
+  foreach ([
+    'transport' => 'preview',
+    'site_url' => 'https://iosdevelop.github.io/fresco-recipes',
+    'repository_owner' => 'iosdevelop',
+    'repository_name' => 'fresco-recipes',
+    'branch' => 'main',
+    'github_app_id' => '',
+    'github_installation_id' => '',
+    'api_url' => 'https://api.github.com',
+    'api_version' => '2026-03-10',
+  ] as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+}
+
+/**
+ * Grants publication access to authenticated local editors.
+ */
+function _fresco_pages_grant_permissions(): void {
+  $role = Role::load('authenticated');
+  if ($role !== NULL) {
+    $role->grantPermission('publish fresco pages');
+    $role->save();
+  }
+}

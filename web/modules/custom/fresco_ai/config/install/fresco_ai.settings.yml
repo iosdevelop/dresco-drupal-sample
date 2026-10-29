@@ -1,0 +1,9 @@
+provider: local
+openai_model: gpt-4.1-mini
+ollama_model: llama3.1
+ollama_base_url: 'http://host.docker.internal:11434'
+image_provider: ollama
+openai_vision_model: gpt-4.1-mini
+ollama_vision_model: 'moondream:latest'
+request_rate_limit_per_hour: 20
+audit_retention_days: 30

@@ -1,0 +1,89 @@
+services:
+  plugin.manager.fresco_ai_provider:
+    class: Drupal\fresco_ai\Service\AiProviderManager
+    parent: default_plugin_manager
+
+  fresco_ai.prompt_builder:
+    class: Drupal\fresco_ai\Service\PromptBuilder
+
+  fresco_ai.recipe_schema:
+    class: Drupal\fresco_ai\Service\RecipeSchema
+
+  fresco_ai.generation:
+    class: Drupal\fresco_ai\Service\GenerationCoordinator
+    arguments:
+      - '@plugin.manager.fresco_ai_provider'
+      - '@config.factory'
+      - '@fresco_recipe.contract_factory'
+      - '@fresco_recipe.validator'
+      - '@fresco_ai.rate_limiter'
+      - '@fresco_ai.usage_ledger'
+      - '@current_user'
+      - '@logger.channel.fresco_ai'
+      - '@fresco_ai.vegan_substituter'
+      - '@fresco_ai.sweetener_limiter'
+
+  fresco_ai.vegan_substituter:
+    class: Drupal\fresco_ai\Service\VeganSubstituter
+
+  fresco_ai.sweetener_limiter:
+    class: Drupal\fresco_ai\Service\SweetenerLimiter
+
+  fresco_ai.ingredient_image_analyzer:
+    class: Drupal\fresco_ai\Service\IngredientImageAnalyzer
+    arguments:
+      - '@http_client'
+      - '@config.factory'
+      - '@fresco_ai.rate_limiter'
+      - '@fresco_ai.usage_ledger'
+      - '@current_user'
+      - '@logger.channel.fresco_ai'
+
+  fresco_ai.usage_ledger:
+    class: Drupal\fresco_ai\Service\AiUsageLedger
+    arguments:
+      - '@state'
+      - '@config.factory'
+
+  fresco_ai.rate_limiter:
+    class: Drupal\fresco_ai\Service\AiRateLimiter
+    arguments:
+      - '@state'
+      - '@config.factory'
+
+  fresco_ai.preflight:
+    class: Drupal\fresco_ai\Service\AiPreflight
+    arguments:
+      - '@config.factory'
+      - '@plugin.manager.fresco_ai_provider'
+      - '@fresco_ai.rate_limiter'
+      - '@fresco_ai.usage_ledger'
+
+  fresco_ai.request_processor:
+    class: Drupal\fresco_ai\Service\AiRequestProcessor
+    arguments:
+      - '@fresco_ai.generation'
+      - '@fresco_ai.ingredient_image_analyzer'
+      - '@fresco_ai.usage_ledger'
+
+  logger.channel.fresco_ai:
+    parent: logger.channel_base
+    arguments: ['fresco_ai']
+
+  fresco_ai.recipe_quality_checker:
+    class: Drupal\fresco_ai\Eval\RecipeQualityChecker
+
+  fresco_ai.recipe_evaluator:
+    class: Drupal\fresco_ai\Eval\RecipeEvaluator
+    arguments:
+      - '@fresco_ai.generation'
+      - '@fresco_ai.recipe_quality_checker'
+      - '@extension.list.module'
+
+  fresco_ai.recipe_draft_creator:
+    class: Drupal\fresco_ai\Service\RecipeDraftCreator
+    arguments:
+      - '@fresco_ai.generation'
+      - '@fresco_recipe.validator'
+      - '@entity_type.manager'
+      - '@current_user'

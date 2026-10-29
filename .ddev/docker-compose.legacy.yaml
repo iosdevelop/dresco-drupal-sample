@@ -1,0 +1,7 @@
+services:
+  web:
+    environment:
+      - FRESCO_LEGACY_DB=/mnt/fresco-legacy/app.sqlite
+    volumes:
+      - '${DDEV_APPROOT}/../fresco/storage/database/app.sqlite:/mnt/fresco-legacy/app.sqlite:ro'
+

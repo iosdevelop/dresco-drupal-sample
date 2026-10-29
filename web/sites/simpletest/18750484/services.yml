@@ -1,0 +1,17 @@
+parameters:
+    security.enable_super_user: true
+    session.storage.options: { gc_probability: 0, gc_divisor: 100, gc_maxlifetime: 200000, cookie_lifetime: 2000000, cookie_samesite: Lax, name_suffix: '' }
+    twig.config: { debug: false, auto_reload: null, cache: true, allowed_file_extensions: [css, html, js, svg, twig] }
+    renderer.config: { required_cache_contexts: ['languages:language_interface', theme, user.permissions], auto_placeholder_conditions: { max-age: 0, contexts: [session, user], tags: {  } }, debug: false }
+    http.response.debug_cacheability_headers: false
+    factory.keyvalue: {  }
+    factory.keyvalue.expirable: {  }
+    filter_protocols: [http, https, ftp, news, nntp, tel, telnet, mailto, irc, ssh, sftp, webcal, rtsp]
+    cors.config: { enabled: false, allowedHeaders: {  }, allowedMethods: {  }, allowedOrigins: ['*'], allowedOriginsPatterns: {  }, exposedHeaders: false, maxAge: false, supportsCredentials: false }
+    entity.memory_cache.slots: 1000
+    queue.config: { suspendMaximumWait: 30 }
+    drupal.test_wait_terminate: false
+services:
+    testing.config_schema_checker: { class: Drupal\Core\Config\Development\ConfigSchemaChecker, arguments: ['@config.typed', [config_schema_test.no_schema, config_schema_test.some_schema, config_schema_test.schema_data_types, config_schema_test.no_schema_data_types, config_test.dynamic.system], false], tags: [{ name: event_subscriber }] }
+    testing.http_client.middleware: { class: Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware, tags: [{ name: http_client_middleware }] }
+    testing.http_middleware.wait_terminate_middleware: { class: Drupal\Core\Test\StackMiddleware\TestWaitTerminateMiddleware, arguments: ['@lock', '%drupal.test_wait_terminate%'], tags: [{ name: http_middleware, priority: -1024 }] }

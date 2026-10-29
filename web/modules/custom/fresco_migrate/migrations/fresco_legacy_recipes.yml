@@ -1,0 +1,37 @@
+id: fresco_legacy_recipes
+label: 'Legacy Fresco recipes'
+migration_tags:
+  - Fresco
+  - Content
+source:
+  plugin: fresco_legacy_recipe
+  path: /mnt/fresco-legacy/app.sqlite
+  track_changes: true
+  constants:
+    type: recipe
+    owner: 1
+process:
+  type: constants/type
+  uid: constants/owner
+  title: title
+  status: published
+  created: created
+  changed: changed
+  field_recipe_description: description
+  field_servings: servings
+  field_prep_minutes: prep_time_minutes
+  field_cook_minutes: cook_time_minutes
+  field_cuisine: cuisine
+  field_category: category
+  field_ingredients: ingredients
+  field_instructions: instructions
+  field_appliance_settings: appliance_settings
+  field_nutrition: nutrition
+  field_provider: provider
+  field_generation_context: generation_context
+  field_pages_url: pages_url
+  field_legacy_id: id
+destination:
+  plugin: 'entity:node'
+  default_bundle: recipe
+migration_dependencies: {  }

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="Dresco">
+  <description>Drupal and DrupalPractice coding standards for Dresco custom code.</description>
+  <file>web/modules/custom</file>
+  <file>web/themes/custom</file>
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme,css,info,txt,md,yml"/>
+  <arg name="colors"/>
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+</ruleset>
+

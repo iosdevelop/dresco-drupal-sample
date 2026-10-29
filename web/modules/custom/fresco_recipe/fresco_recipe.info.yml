@@ -1,0 +1,14 @@
+name: Dresco Recipe
+type: module
+description: Structured recipe authoring, validation, revisions, and exports for Dresco.
+package: Dresco
+core_version_requirement: ^11
+dependencies:
+  - drupal:file
+  - drupal:image
+  - drupal:node
+  - drupal:media
+  - drupal:options
+  - drupal:taxonomy
+  - drupal:workflows
+  - drupal:content_moderation

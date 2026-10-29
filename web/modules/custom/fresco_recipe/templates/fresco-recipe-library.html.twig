@@ -1,0 +1,44 @@
+<section class="fresco-page-head">
+  <div>
+    <p class="fresco-eyebrow">Library</p>
+    <h1>{{ 'Recipe library'|t }}</h1>
+    <p>{{ 'Search by title, ingredient, cuisine, or appliance.'|t }}</p>
+  </div>
+  <a class="fresco-button" href="{{ path('fresco_recipe.generator') }}">{{ 'Generate'|t }}</a>
+</section>
+
+<form class="fresco-search" method="get" role="search">
+  <label for="fresco-library-query">{{ 'Search recipes'|t }}</label>
+  <div>
+    <input id="fresco-library-query" name="q" value="{{ query }}" placeholder="{{ 'mushrooms, rice, Instant Pot'|t }}">
+    <button type="submit">{{ 'Search'|t }}</button>
+  </div>
+</form>
+
+<div class="fresco-card-grid">
+  {% for recipe in recipes %}
+    <article class="fresco-card">
+      <a href="{{ recipe.url }}" tabindex="-1" aria-hidden="true">
+        <img class="fresco-card-image" src="{{ recipe.image_url }}" alt="" width="1200" height="800" loading="lazy">
+      </a>
+      <p class="fresco-eyebrow">{{ recipe.cuisine }} · {{ recipe.status }}</p>
+      <h2><a href="{{ recipe.url }}">{{ recipe.title }}</a></h2>
+      <p>{{ recipe.description }}</p>
+      <p class="fresco-meta">{{ 'Updated'|t }} {{ recipe.changed }}</p>
+      <div class="fresco-actions">
+        <a class="fresco-button fresco-button--secondary" href="{{ recipe.url }}">{{ 'View recipe'|t }}</a>
+        {% if recipe.public_url %}
+          <button type="button" class="fresco-button fresco-button--secondary" data-fresco-copy-url="{{ recipe.public_url }}">{{ 'Copy public URL'|t }}</button>
+          <a class="fresco-button fresco-button--secondary" href="{{ recipe.public_url }}" target="_blank" rel="noopener">{{ 'Open public recipe'|t }}</a>
+        {% elseif recipe.public_message %}
+          <span class="fresco-meta">{{ recipe.public_message|t }}</span>
+        {% endif %}
+      </div>
+    </article>
+  {% else %}
+    <div class="fresco-empty">
+      <h2>{{ 'No recipes found'|t }}</h2>
+      <p>{{ query ? 'Try a different search.'|t : 'Generate your first recipe draft.'|t }}</p>
+    </div>
+  {% endfor %}
+</div>

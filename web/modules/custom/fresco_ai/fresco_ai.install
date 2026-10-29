@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * Update hooks for the Dresco AI provider system.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Creates provider settings for sites that installed the foundation module.
+ */
+function fresco_ai_update_11001(): string {
+  $config = \Drupal::configFactory()->getEditable('fresco_ai.settings');
+  $defaults = [
+    'provider' => 'local',
+    'openai_model' => 'gpt-4.1-mini',
+    'ollama_model' => 'llama3.1',
+    'ollama_base_url' => 'http://host.docker.internal:11434',
+    'image_provider' => 'ollama',
+    'openai_vision_model' => 'gpt-4.1-mini',
+    'ollama_vision_model' => 'moondream:latest',
+    'request_rate_limit_per_hour' => 20,
+    'audit_retention_days' => 30,
+  ];
+  foreach ($defaults as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+  return 'Created Fresco AI provider settings.';
+}
+
+/**
+ * Adds ingredient-image provider defaults.
+ */
+function fresco_ai_update_11002(): string {
+  $config = \Drupal::configFactory()->getEditable('fresco_ai.settings');
+  foreach ([
+    'image_provider' => 'ollama',
+    'openai_vision_model' => 'gpt-4.1-mini',
+    'ollama_vision_model' => 'moondream:latest',
+    'request_rate_limit_per_hour' => 20,
+    'audit_retention_days' => 30,
+  ] as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+  return 'Added ingredient-image provider settings.';
+}
+
+/**
+ * Adds AI audit retention and request rate limit defaults.
+ */
+function fresco_ai_update_11003(): string {
+  $config = \Drupal::configFactory()->getEditable('fresco_ai.settings');
+  foreach ([
+    'request_rate_limit_per_hour' => 20,
+    'audit_retention_days' => 30,
+  ] as $key => $value) {
+    if ($config->get($key) === NULL) {
+      $config->set($key, $value);
+    }
+  }
+  $config->save();
+  return 'Added AI audit and rate-limit defaults.';
+}

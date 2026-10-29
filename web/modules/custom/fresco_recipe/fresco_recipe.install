@@ -1,0 +1,262 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall hooks for Dresco recipes.
+ */
+
+declare(strict_types=1);
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\media\Entity\MediaType;
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function fresco_recipe_install(): void {
+  _fresco_recipe_ensure_fields();
+  _fresco_recipe_configure_site();
+}
+
+/**
+ * Adds the initial recipe authoring fields.
+ */
+function fresco_recipe_update_11001(): string {
+  _fresco_recipe_ensure_fields();
+  _fresco_recipe_configure_site();
+  return 'Created the initial Fresco recipe fields.';
+}
+
+/**
+ * Grants the initial authenticated editorial permissions.
+ */
+function fresco_recipe_update_11002(): string {
+  _fresco_recipe_configure_site();
+  return 'Granted authenticated Fresco editorial permissions.';
+}
+
+/**
+ * Adds explicit legacy provenance storage for repeatable migrations.
+ */
+function fresco_recipe_update_11003(): string {
+  _fresco_recipe_ensure_fields();
+  return 'Added legacy recipe provenance storage.';
+}
+
+/**
+ * Adds media image storage for legacy recipe artwork migration.
+ */
+function fresco_recipe_update_11004(): string {
+  _fresco_recipe_ensure_fields();
+  return 'Added legacy recipe media image storage.';
+}
+
+/**
+ * Adds the family-only flag that publishes a recipe behind family sign-in.
+ */
+function fresco_recipe_update_11005(): string {
+  _fresco_recipe_ensure_fields();
+  return 'Added the family-only recipe flag.';
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function fresco_recipe_uninstall(): void {
+  $siteConfig = \Drupal::configFactory()->getEditable('system.site');
+  if ($siteConfig->get('page.front') === '/dashboard') {
+    $siteConfig->set('page.front', '/node')->save();
+  }
+}
+
+/**
+ * Applies the default local application navigation and permissions.
+ */
+function _fresco_recipe_configure_site(): void {
+  $role = Role::load('authenticated');
+  if ($role !== NULL) {
+    foreach ([
+      'access fresco dashboard',
+      'generate fresco recipes',
+      'export fresco recipes',
+      'create recipe content',
+      'edit own recipe content',
+      'delete own recipe content',
+      'view own unpublished content',
+      'view recipe revisions',
+    ] as $permission) {
+      $role->grantPermission($permission);
+    }
+    $role->save();
+  }
+  \Drupal::configFactory()
+    ->getEditable('system.site')
+    ->set('page.front', '/dashboard')
+    ->save();
+}
+
+/**
+ * Creates missing recipe fields for fresh and existing installations.
+ */
+function _fresco_recipe_ensure_fields(): void {
+  _fresco_recipe_ensure_media_type();
+
+  $definitions = [
+    'field_recipe_description' => [
+      'label' => 'Description',
+      'type' => 'string_long',
+      'required' => TRUE,
+    ],
+    'field_servings' => [
+      'label' => 'Servings',
+      'type' => 'integer',
+      'required' => TRUE,
+      'settings' => ['min' => 1],
+    ],
+    'field_prep_minutes' => [
+      'label' => 'Preparation minutes',
+      'type' => 'integer',
+      'required' => TRUE,
+      'settings' => ['min' => 1],
+    ],
+    'field_cook_minutes' => [
+      'label' => 'Cooking minutes',
+      'type' => 'integer',
+      'required' => TRUE,
+      'settings' => ['min' => 1],
+    ],
+    'field_cuisine' => [
+      'label' => 'Cuisine',
+      'type' => 'string',
+      'required' => TRUE,
+      'storage_settings' => ['max_length' => 128],
+    ],
+    'field_category' => [
+      'label' => 'Category',
+      'type' => 'string',
+      'required' => TRUE,
+      'storage_settings' => ['max_length' => 128],
+    ],
+    'field_ingredients' => [
+      'label' => 'Ingredients',
+      'type' => 'string_long',
+      'required' => TRUE,
+      'cardinality' => -1,
+    ],
+    'field_instructions' => [
+      'label' => 'Instructions',
+      'type' => 'string_long',
+      'required' => TRUE,
+      'cardinality' => -1,
+    ],
+    'field_appliance_settings' => [
+      'label' => 'Appliance settings',
+      'type' => 'string_long',
+      'cardinality' => -1,
+    ],
+    'field_nutrition' => [
+      'label' => 'Nutrition',
+      'type' => 'string_long',
+    ],
+    'field_provider' => [
+      'label' => 'Generation provider',
+      'type' => 'string',
+      'storage_settings' => ['max_length' => 64],
+    ],
+    'field_generation_context' => [
+      'label' => 'Generation context',
+      'type' => 'string_long',
+    ],
+    'field_pages_url' => [
+      'label' => 'GitHub Pages URL',
+      'type' => 'string',
+      'storage_settings' => ['max_length' => 2048],
+    ],
+    'field_hero_image' => [
+      'label' => 'Hero image',
+      'type' => 'entity_reference',
+      'cardinality' => 1,
+      'storage_settings' => [
+        'target_type' => 'media',
+      ],
+      'settings' => [
+        'handler' => 'default:media',
+        'handler_settings' => ['target_bundles' => ['recipe_image' => 'recipe_image']],
+      ],
+    ],
+    'field_legacy_id' => [
+      'label' => 'Legacy recipe ID',
+      'type' => 'integer',
+    ],
+    'field_family_only' => [
+      'label' => 'Family only',
+      'type' => 'boolean',
+    ],
+  ];
+
+  foreach ($definitions as $fieldName => $definition) {
+    $storage = FieldStorageConfig::loadByName('node', $fieldName);
+    if ($storage === NULL) {
+      $storage = FieldStorageConfig::create([
+        'field_name' => $fieldName,
+        'entity_type' => 'node',
+        'type' => $definition['type'],
+        'cardinality' => $definition['cardinality'] ?? 1,
+        'settings' => $definition['storage_settings'] ?? [],
+      ]);
+      $storage->save();
+    }
+
+    if (FieldConfig::loadByName('node', 'recipe', $fieldName) === NULL) {
+      FieldConfig::create([
+        'field_storage' => $storage,
+        'bundle' => 'recipe',
+        'label' => $definition['label'],
+        'required' => $definition['required'] ?? FALSE,
+        'settings' => $definition['settings'] ?? [],
+      ])->save();
+    }
+  }
+}
+
+/**
+ * Creates the recipe image media bundle and image field.
+ */
+function _fresco_recipe_ensure_media_type(): void {
+  if (MediaType::load('recipe_image') === NULL) {
+    MediaType::create([
+      'id' => 'recipe_image',
+      'label' => 'Recipe image',
+      'description' => 'Legacy or generated hero artwork for a recipe.',
+      'source' => 'image',
+      'source_configuration' => [
+        'source_field' => 'field_media_image',
+      ],
+      'new_revision' => TRUE,
+    ])->save();
+  }
+
+  $storage = FieldStorageConfig::loadByName('media', 'field_media_image');
+  if ($storage === NULL) {
+    $storage = FieldStorageConfig::create([
+      'field_name' => 'field_media_image',
+      'entity_type' => 'media',
+      'type' => 'image',
+      'cardinality' => 1,
+      'settings' => [],
+    ]);
+    $storage->save();
+  }
+
+  if (FieldConfig::loadByName('media', 'recipe_image', 'field_media_image') === NULL) {
+    FieldConfig::create([
+      'field_storage' => $storage,
+      'bundle' => 'recipe_image',
+      'label' => 'Image',
+      'required' => TRUE,
+      'settings' => [],
+    ])->save();
+  }
+}

@@ -1,0 +1,79 @@
+services:
+  fresco_pages.renderer:
+    class: Drupal\fresco_pages\Service\StaticRecipeRenderer
+    arguments: ['@fresco_recipe.svg_builder']
+
+  fresco_pages.site_renderer:
+    class: Drupal\fresco_pages\Service\StaticSiteRenderer
+
+  fresco_pages.site_assembler:
+    class: Drupal\fresco_pages\Service\SiteArtifactAssembler
+    arguments:
+      - '@entity_type.manager'
+      - '@fresco_recipe.node_mapper'
+      - '@fresco_pages.site_renderer'
+      - '@config.factory'
+
+  fresco_pages.artifact_writer:
+    class: Drupal\fresco_pages\Service\StaticArtifactWriter
+
+  fresco_pages.local_tree_inspector:
+    class: Drupal\fresco_pages\Service\LocalStaticTreeInspector
+    arguments: ['@fresco_pages.drift_analyzer']
+
+  fresco_pages.github_authenticator:
+    class: Drupal\fresco_pages\Service\GitHubAppAuthenticator
+    arguments: ['@http_client', '@config.factory']
+
+  fresco_pages.github_client:
+    class: Drupal\fresco_pages\Service\GitHubGitClient
+    arguments: ['@http_client', '@config.factory', '@fresco_pages.github_authenticator']
+
+  fresco_pages.github_preflight:
+    class: Drupal\fresco_pages\Service\GitHubPreflight
+    arguments: ['@config.factory', '@fresco_pages.github_client']
+
+  fresco_pages.drift_analyzer:
+    class: Drupal\fresco_pages\Service\PublicationDriftAnalyzer
+
+  fresco_pages.transport:
+    class: Drupal\fresco_pages\Service\PublicationTransport
+    arguments: ['@config.factory', '@fresco_pages.github_client']
+
+  fresco_pages.publisher:
+    class: Drupal\fresco_pages\Service\PublicationManager
+    arguments:
+      - '@entity_type.manager'
+      - '@queue'
+      - '@lock'
+      - '@fresco_recipe.node_mapper'
+      - '@fresco_pages.renderer'
+      - '@transliteration'
+      - '@config.factory'
+      - '@fresco_pages.github_client'
+      - '@fresco_pages.site_assembler'
+      - '@fresco_pages.drift_analyzer'
+      - '@fresco_recipe.validator'
+
+  Drupal\fresco_pages\Service\PagesPublisherInterface:
+    alias: fresco_pages.publisher
+
+  fresco_pages.recipe_deletion_guard:
+    class: Drupal\fresco_pages\Service\RecipeDeletionGuard
+    arguments:
+      - '@fresco_pages.publisher'
+      - '@current_user'
+      - '@logger.channel.fresco_pages'
+
+  fresco_pages.processor:
+    class: Drupal\fresco_pages\Service\PublicationProcessor
+    arguments:
+      - '@entity_type.manager'
+      - '@lock'
+      - '@fresco_pages.transport'
+      - '@fresco_pages.site_assembler'
+      - '@logger.channel.fresco_pages'
+
+  logger.channel.fresco_pages:
+    parent: logger.channel_base
+    arguments: ['fresco_pages']

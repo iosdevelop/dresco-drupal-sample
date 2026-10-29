@@ -1,0 +1,85 @@
+fresco_pages.settings:
+  path: '/admin/config/fresco/pages'
+  defaults:
+    _form: '\Drupal\fresco_pages\Form\PagesSettingsForm'
+    _title: 'Dresco Pages settings'
+  requirements:
+    _permission: 'administer fresco pages'
+
+fresco_pages.publications:
+  path: '/admin/content/fresco/publications'
+  defaults:
+    _controller: '\Drupal\fresco_pages\Controller\PublicationController::overview'
+    _title: 'Dresco publications'
+  requirements:
+    _permission: 'publish fresco pages'
+
+fresco_pages.preview:
+  path: '/admin/content/fresco/publications/{fresco_publication}/preview'
+  defaults:
+    _controller: '\Drupal\fresco_pages\Controller\PublicationController::preview'
+  requirements:
+    _permission: 'publish fresco pages'
+    fresco_publication: '\d+'
+  options:
+    parameters:
+      fresco_publication:
+        type: entity:fresco_publication
+
+fresco_pages.retry:
+  path: '/admin/content/fresco/publications/{fresco_publication}/retry'
+  defaults:
+    _form: '\Drupal\fresco_pages\Form\PublicationRetryForm'
+    _title: 'Queue publication again'
+  requirements:
+    _permission: 'publish fresco pages'
+    fresco_publication: '\d+'
+  options:
+    parameters:
+      fresco_publication:
+        type: entity:fresco_publication
+
+fresco_pages.archive:
+  path: '/admin/content/fresco/publications/{fresco_publication}/archive'
+  defaults:
+    _form: '\Drupal\fresco_pages\Form\PublicationArchiveForm'
+    _title: 'Archive Dresco Pages recipe'
+  requirements:
+    _permission: 'publish fresco pages'
+    fresco_publication: '\d+'
+  options:
+    parameters:
+      fresco_publication:
+        type: entity:fresco_publication
+
+fresco_pages.site_preview:
+  path: '/admin/content/fresco/publications/site-preview'
+  defaults:
+    _controller: '\Drupal\fresco_pages\Controller\PublicationController::sitePreview'
+    _title: 'Dresco Pages site preview'
+  requirements:
+    _permission: 'publish fresco pages'
+
+fresco_pages.queue_published:
+  path: '/admin/content/fresco/publications/queue-published'
+  defaults:
+    _form: '\Drupal\fresco_pages\Form\QueuePublishedRecipesForm'
+    _title: 'Queue published recipes'
+  requirements:
+    _permission: 'publish fresco pages'
+
+fresco_pages.reconciliation:
+  path: '/admin/content/fresco/publications/reconciliation'
+  defaults:
+    _controller: '\Drupal\fresco_pages\Controller\PublicationController::reconciliation'
+    _title: 'Dresco Pages reconciliation'
+  requirements:
+    _permission: 'publish fresco pages'
+
+fresco_pages.repair:
+  path: '/admin/content/fresco/publications/reconciliation/repair'
+  defaults:
+    _form: '\Drupal\fresco_pages\Form\SiteRepairForm'
+    _title: 'Repair Dresco Pages'
+  requirements:
+    _permission: 'publish fresco pages'

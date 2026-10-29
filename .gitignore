@@ -1,0 +1,29 @@
+/vendor/
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/libraries/
+/web/sites/*/files/
+/web/sites/*/private/
+/web/sites/*/settings.php
+/web/sites/*/settings.local.php
+/web/sites/*/services.local.yml
+/.phpunit.result.cache
+/.phpstan.cache/
+/.ddev/.env
+/.env
+/.fresco-pages-preview/
+/fresco-pages-preview/
+
+# Private keys never belong in the repo.
+*.pem
+
+# DDEV-generated router config and local TLS certificates.
+/.ddev/traefik/
+
+# AI assistant files (local only, never committed)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
+AGENTS.md

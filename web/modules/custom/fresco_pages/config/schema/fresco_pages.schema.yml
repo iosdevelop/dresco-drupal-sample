@@ -1,0 +1,31 @@
+fresco_pages.settings:
+  type: config_object
+  label: 'Dresco Pages settings'
+  mapping:
+    transport:
+      type: string
+      label: 'Publication transport'
+    site_url:
+      type: uri
+      label: 'Canonical GitHub Pages URL'
+    repository_owner:
+      type: string
+      label: 'Repository owner'
+    repository_name:
+      type: string
+      label: 'Repository name'
+    branch:
+      type: string
+      label: 'Publication branch'
+    github_app_id:
+      type: string
+      label: 'GitHub App ID'
+    github_installation_id:
+      type: string
+      label: 'GitHub App installation ID'
+    api_url:
+      type: uri
+      label: 'GitHub API URL'
+    api_version:
+      type: string
+      label: 'GitHub API version'

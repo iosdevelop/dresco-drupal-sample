@@ -1,0 +1,12 @@
+fresco_pages.publications:
+  title: 'Dresco publications'
+  description: 'Review immutable recipe publication records.'
+  route_name: fresco_pages.publications
+  parent: system.admin_content
+  weight: 30
+
+fresco_pages.settings:
+  title: 'Dresco Pages'
+  description: 'Configure safe static publication to GitHub Pages.'
+  route_name: fresco_pages.settings
+  parent: system.admin_config_services

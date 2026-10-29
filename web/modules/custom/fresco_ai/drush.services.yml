@@ -1,0 +1,15 @@
+services:
+  fresco_ai.commands:
+    class: Drupal\fresco_ai\Drush\Commands\FrescoAiCommands
+    arguments:
+      - '@fresco_ai.preflight'
+      - '@fresco_ai.usage_ledger'
+      - '@queue'
+      - '@fresco_ai.request_processor'
+      - '@fresco_ai.ingredient_image_analyzer'
+      - '@current_user'
+      - '@config.factory'
+      - '@http_client'
+      - '@fresco_ai.recipe_evaluator'
+    tags:
+      - { name: drush.command }

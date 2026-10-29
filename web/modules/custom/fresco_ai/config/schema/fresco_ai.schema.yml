@@ -1,0 +1,31 @@
+fresco_ai.settings:
+  type: config_object
+  label: 'Dresco AI settings'
+  mapping:
+    provider:
+      type: string
+      label: 'Generation provider'
+    openai_model:
+      type: string
+      label: 'OpenAI model'
+    ollama_model:
+      type: string
+      label: 'Ollama model'
+    ollama_base_url:
+      type: string
+      label: 'Ollama base URL'
+    image_provider:
+      type: string
+      label: 'Ingredient image provider'
+    openai_vision_model:
+      type: string
+      label: 'OpenAI vision model'
+    ollama_vision_model:
+      type: string
+      label: 'Ollama vision model'
+    request_rate_limit_per_hour:
+      type: integer
+      label: 'Request rate limit per hour'
+    audit_retention_days:
+      type: integer
+      label: 'Audit retention days'

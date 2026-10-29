@@ -1,0 +1,136 @@
+# Recipe generation evaluation cases for `drush fresco:ai:eval`.
+#
+# Each case is a generator request plus an optional `title` regular expression
+# the generated title should match. Keep cases realistic: they are what a
+# person would type into the generator form.
+
+tofu_stir_fry:
+  title: '/stir[- ]?fr/i'
+  request:
+    ingredients: ['14 oz firm tofu', '1 broccoli crown', '2 tbsp soy sauce', '1 red bell pepper']
+    appliances: ['Stovetop']
+
+lentil_soup:
+  title: '/soup|stew/i'
+  request:
+    ingredients: ['1 cup red lentils', '1 onion', '2 carrots', '3 cloves garlic', '4 cups vegetable broth']
+    appliances: ['Stovetop']
+
+chickpea_curry_instant_pot:
+  title: '/curry/i'
+  request:
+    ingredients: ['2 cans chickpeas', '1 can coconut milk', '1 onion', '2 tbsp curry powder', '1 cup spinach']
+    appliances: ['Instant Pot Pro WiFi (6 qt)']
+
+air_fryer_potatoes:
+  request:
+    ingredients: ['2 lb potatoes', '2 tbsp olive oil', '1 tsp paprika']
+    appliances: ['Emeril Lagasse Air Fryer Oven']
+
+roasted_vegetables_oven:
+  request:
+    ingredients: ['1 head cauliflower', '2 carrots', '1 red onion', '1 tsp cumin']
+    appliances: ['Standard Kitchen Oven']
+
+mushroom_risotto:
+  title: '/risotto/i'
+  request:
+    ingredients: ['1 1/2 cups arborio rice', '8 oz mushrooms', '1 shallot', '5 cups vegetable broth']
+    appliances: ['Stovetop']
+
+rice_and_beans_instant_pot:
+  request:
+    ingredients: ['1 cup brown rice', '1 can black beans', '1 cup corn']
+    appliances: ['Instant Pot Pro WiFi (6 qt)']
+    cuisine_vibe: 'Mexican'
+
+spaghetti_marinara:
+  title: '/spaghetti|pasta|marinara/i'
+  request:
+    ingredients: ['8 oz spaghetti', '1 can crushed tomatoes', '4 cloves garlic', '1 tsp dried basil']
+    appliances: ['Stovetop']
+
+flatbread_dough:
+  title: '/bread|flatbread|naan|pizza/i'
+  request:
+    ingredients: ['3 cups flour', '1 cup warm water', '1 packet yeast', '1 tbsp olive oil']
+    appliances: ['Standard Kitchen Oven']
+
+black_bean_tacos_cuisine:
+  title: '/taco/i'
+  request:
+    ingredients: ['1 can black beans', '8 corn tortillas', '1 avocado', '1 lime']
+    appliances: ['Stovetop']
+    cuisine_vibe: 'Mexican'
+
+no_cook_cucumber_salad:
+  title: '/salad/i'
+  request:
+    ingredients: ['2 cucumbers', '1 can chickpeas', '1 cup cherry tomatoes', '1/4 red onion']
+    appliances: ['No-cook (prep only)']
+
+overnight_oats:
+  title: '/oat/i'
+  request:
+    ingredients: ['1 cup rolled oats', '1 cup oat milk', '2 tbsp chia seeds', '1 cup blueberries']
+    appliances: ['No-cook (prep only)']
+
+fruit_salad_no_cook:
+  title: '/fruit salad/i'
+  request:
+    ingredients: ['2 mangos', '1 cup strawberries', '1 banana']
+    appliances: ['No-cook (prep only)']
+
+berry_smoothie:
+  title: '/smoothie/i'
+  request:
+    ingredients: ['1 banana', '1 cup frozen berries', '1 cup oat milk']
+    appliances: ['Blender']
+
+banana_bread:
+  title: '/bread|loaf/i'
+  request:
+    ingredients: ['3 ripe bananas', '2 cups flour', '1/2 cup sugar', '1 tsp baking soda', '1/3 cup oil']
+    appliances: ['Standard Kitchen Oven']
+
+non_vegan_bake:
+  request:
+    ingredients: ['1 lb chicken breast', '2 eggs', '1 cup cheddar cheese', '2 tbsp butter', '1 broccoli crown']
+    appliances: ['Standard Kitchen Oven']
+
+non_vegan_breakfast:
+  request:
+    ingredients: ['4 eggs', '1/2 cup milk', '1 cup spinach', '1/4 cup feta']
+    appliances: ['Stovetop']
+
+restaurant_pad_thai:
+  title: '/pad thai|noodle/i'
+  request:
+    mode: restaurant
+    menu_item: 'Pad Thai'
+    ingredients: []
+    appliances: ['Stovetop']
+
+restaurant_burrito_bowl:
+  title: '/burrito|bowl/i'
+  request:
+    mode: restaurant
+    menu_item: 'Chipotle burrito bowl'
+    ingredients: []
+    appliances: ['Stovetop']
+
+restaurant_ramen:
+  title: '/ramen|noodle/i'
+  request:
+    mode: restaurant
+    menu_item: 'Tonkotsu ramen'
+    ingredients: []
+    appliances: ['Stovetop']
+
+restaurant_samosas:
+  title: '/samosa|hand pie/i'
+  request:
+    mode: restaurant
+    menu_item: 'Samosas'
+    ingredients: []
+    appliances: ['Emeril Lagasse Air Fryer Oven']

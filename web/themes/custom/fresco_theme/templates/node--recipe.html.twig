@@ -1,0 +1,104 @@
+<article{{ attributes.addClass('fresco-recipe') }}>
+  <header class="fresco-recipe-head">
+    <div>
+      <p class="fresco-eyebrow">{{ node.field_cuisine.value }} · {{ node.field_category.value }}</p>
+      <h1>{{ label }}</h1>
+      <p>{{ node.field_recipe_description.value }}</p>
+      <p class="fresco-meta">
+        {{ 'Prep'|t }} {{ node.field_prep_minutes.value }} {{ 'min'|t }} ·
+        {{ 'Cook'|t }} {{ node.field_cook_minutes.value }} {{ 'min'|t }} ·
+        {{ 'Serves'|t }} {{ node.field_servings.value }}
+      </p>
+      {% if logged_in %}
+        <div class="fresco-actions">
+          <a class="fresco-button" href="{{ path('fresco_recipe.edit', {'node': node.id()}) }}">{{ 'Edit recipe'|t }}</a>
+          <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.save_as_new', {'node': node.id()}) }}">{{ 'Save as new'|t }}</a>
+          {% if not node.isPublished() %}
+            <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.publish', {'node': node.id()}) }}">{{ 'Validate and publish'|t }}</a>
+          {% endif %}
+          {% if public_recipe_url %}
+            <button class="fresco-button fresco-button--secondary" type="button" data-fresco-copy-url="{{ public_recipe_url }}" aria-describedby="copy-url-status">{{ 'Copy public URL'|t }}</button>
+            <a class="fresco-button fresco-button--secondary" href="{{ public_recipe_url }}" target="_blank" rel="noopener">{{ 'Open public recipe'|t }}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+      {% if logged_in and public_recipe_status_message %}
+        <p class="fresco-note">
+          {{ 'Publication status'|t }}: {{ public_recipe_state }}. {{ public_recipe_status_message|t }}
+          {% if publications_url %}
+            <a href="{{ publications_url }}">{{ 'Review publications'|t }}</a>
+          {% endif %}
+        </p>
+      {% endif %}
+      <span id="copy-url-status" class="sr-only" aria-live="polite"></span>
+    </div>
+    <div class="fresco-recipe-art">
+      <img src="{{ path('fresco_recipe.image', {'node': node.id()}) }}" alt="" width="1200" height="800">
+      <span class="fresco-pill">{{ node.isPublished() ? 'Published'|t : 'Draft'|t }}</span>
+    </div>
+  </header>
+
+  <section class="fresco-section">
+    <h2>{{ 'Ingredients'|t }}</h2>
+    <ul>
+      {% for ingredient in node.field_ingredients %}<li>{{ ingredient.value }}</li>{% endfor %}
+    </ul>
+  </section>
+
+  <section class="fresco-section">
+    <h2>{{ 'Instructions'|t }}</h2>
+    <ol>
+      {% for instruction in node.field_instructions %}<li>{{ instruction.value }}</li>{% endfor %}
+    </ol>
+  </section>
+
+  {% if not node.field_appliance_settings.isEmpty() %}
+    <section class="fresco-section">
+      <h2>{{ 'Appliance settings'|t }}</h2>
+      <ul>
+        {% for setting in node.field_appliance_settings %}<li>{{ setting.value }}</li>{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% if nutrition_items %}
+    <section class="fresco-section">
+      <h2>{{ 'Nutrition estimate'|t }}</h2>
+      <dl>
+        {% for item in nutrition_items %}
+          <dt>{{ item.label }}</dt>
+          <dd>{{ item.value }}</dd>
+        {% endfor %}
+      </dl>
+    </section>
+  {% endif %}
+
+  {% if related_recipes %}
+    <section class="fresco-section">
+      <h2>{{ 'Similar selections'|t }}</h2>
+      <div class="fresco-card-grid">
+        {% for recipe in related_recipes %}
+          <article class="fresco-card">
+            <img class="fresco-card-image" src="{{ recipe.image_url }}" alt="" width="1200" height="800">
+            <p class="fresco-eyebrow">{{ recipe.cuisine }} · {{ recipe.category }}</p>
+            <h3><a href="{{ recipe.url }}">{{ recipe.title }}</a></h3>
+            <p>{{ recipe.description }}</p>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if logged_in %}
+    <section class="fresco-section">
+      <h2>{{ 'Exports'|t }}</h2>
+      <div class="fresco-actions">
+        <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.export', {'node': node.id(), 'format': 'html'}) }}">HTML</a>
+        <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.export', {'node': node.id(), 'format': 'json'}) }}">JSON</a>
+        <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.export', {'node': node.id(), 'format': 'markdown'}) }}">Markdown</a>
+        <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.export', {'node': node.id(), 'format': 'pdf'}) }}">PDF</a>
+        <a class="fresco-button fresco-button--secondary" href="{{ path('fresco_recipe.export', {'node': node.id(), 'format': 'svg'}) }}">SVG artwork</a>
+      </div>
+    </section>
+  {% endif %}
+</article>

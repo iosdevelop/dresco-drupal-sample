@@ -1,0 +1,3 @@
+administer fresco migrations:
+  title: 'Administer Fresco legacy migrations'
+  restrict access: true

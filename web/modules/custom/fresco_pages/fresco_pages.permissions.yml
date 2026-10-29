@@ -1,0 +1,12 @@
+administer fresco pages:
+  title: 'Administer Dresco Pages publication'
+  restrict access: true
+
+publish fresco pages:
+  title: 'Publish recipes to Dresco Pages'
+  restrict access: true
+
+bypass fresco pages archive delete guard:
+  title: 'Bypass Dresco Pages archive-before-delete guard'
+  description: 'Allows hard deletion of public recipe nodes without a prior archive/tombstone publication.'
+  restrict access: true

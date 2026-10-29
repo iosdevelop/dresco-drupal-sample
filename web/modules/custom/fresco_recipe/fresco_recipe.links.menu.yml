@@ -1,0 +1,17 @@
+fresco_recipe.dashboard:
+  title: 'Dashboard'
+  route_name: fresco_recipe.dashboard
+  menu_name: main
+  weight: -20
+
+fresco_recipe.library:
+  title: 'Recipe library'
+  route_name: fresco_recipe.library
+  menu_name: main
+  weight: -10
+
+fresco_recipe.generator:
+  title: 'Generate recipe'
+  route_name: fresco_recipe.generator
+  menu_name: main
+  weight: 0

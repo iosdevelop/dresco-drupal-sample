@@ -1,0 +1,10 @@
+access fresco dashboard:
+  title: 'Access the Dresco recipe dashboard'
+
+generate fresco recipes:
+  title: 'Generate Dresco recipes'
+  description: 'Create recipe drafts using configured AI providers.'
+  restrict access: true
+
+export fresco recipes:
+  title: 'Export Dresco recipes'

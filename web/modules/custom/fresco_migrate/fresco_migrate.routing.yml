@@ -1,0 +1,7 @@
+fresco_migrate.import:
+  path: '/admin/content/fresco/import'
+  defaults:
+    _form: '\Drupal\fresco_migrate\Form\LegacyRecipeImportForm'
+    _title: 'Import legacy Fresco recipes'
+  requirements:
+    _permission: 'administer fresco migrations'

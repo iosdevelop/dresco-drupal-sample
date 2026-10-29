@@ -1,0 +1,8 @@
+name: Dresco Pages
+type: module
+description: Atomic GitHub Pages publication and reconciliation for validated recipes.
+package: Dresco
+core_version_requirement: ^11
+dependencies:
+  - drupal:node
+  - fresco_recipe:fresco_recipe

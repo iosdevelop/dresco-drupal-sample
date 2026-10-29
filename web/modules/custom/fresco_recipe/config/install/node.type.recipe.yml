@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - fresco_recipe
+name: Recipe
+type: recipe
+description: 'A structured, validated Dresco recipe with GitHub Pages publication provenance.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

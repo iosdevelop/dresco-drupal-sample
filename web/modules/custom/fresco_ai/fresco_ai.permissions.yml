@@ -1,0 +1,3 @@
+administer fresco ai:
+  title: 'Administer Dresco AI settings'
+  restrict access: true

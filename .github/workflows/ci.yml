@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mariadb:10.11
+        env:
+          MYSQL_DATABASE: db
+          MYSQL_USER: db
+          MYSQL_PASSWORD: db
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      BROWSERTEST_OUTPUT_DIRECTORY: /tmp/browser_output
+      SIMPLETEST_BASE_URL: http://127.0.0.1:8080
+      SIMPLETEST_DB: mysql://db:db@127.0.0.1:3306/db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: pdo_mysql
+          tools: composer:v2
+      - uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+      - run: composer validate --strict
+      - run: composer phpcs
+      - run: composer phpstan
+      - name: Start Drupal test server
+        run: |
+          mkdir -p "$BROWSERTEST_OUTPUT_DIRECTORY"
+          php -S 127.0.0.1:8080 -t web > /tmp/drupal-test-server.log 2>&1 &
+          echo $! > /tmp/drupal-test-server.pid
+          for attempt in {1..30}; do
+            if curl -fsS "$SIMPLETEST_BASE_URL/core/install.php" > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/drupal-test-server.log
+          exit 1
+      - run: composer test
+      - name: Composer security audit
+        run: composer audit

@@ -1,0 +1,5 @@
+fresco_migrate.import:
+  title: 'Import legacy Fresco recipes'
+  description: 'Import and update recipes from the legacy SQLite application.'
+  route_name: fresco_migrate.import
+  parent: system.admin_content

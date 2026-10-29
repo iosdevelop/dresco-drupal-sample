@@ -1,0 +1,8 @@
+name: Dresco AI
+type: module
+description: Provider-independent recipe generation and ingredient image analysis.
+package: Dresco
+core_version_requirement: ^11
+dependencies:
+  - drupal:file
+  - fresco_recipe:fresco_recipe

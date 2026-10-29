@@ -1,0 +1,155 @@
+<?php
+
+/**
+ * @file
+ * Theme preprocess hooks for the Dresco theme.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Url;
+use Drupal\fresco_pages\Entity\Publication;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Gives iPhone home-screen bookmarks the Dresco icon.
+ */
+function fresco_theme_page_attachments_alter(array &$attachments): void {
+  $attachments['#attached']['html_head_link'][][] = [
+    'rel' => 'apple-touch-icon',
+    'href' => base_path() . \Drupal::service('extension.list.theme')->getPath('fresco_theme') . '/apple-touch-icon.png',
+  ];
+}
+
+/**
+ * Prepares theme variables for the Dresco theme recipe node template.
+ */
+function fresco_theme_preprocess_node__recipe(array &$variables): void {
+  $variables['related_recipes'] = [];
+  $variables['public_recipe_url'] = '';
+  $variables['public_recipe_state'] = '';
+  $variables['public_recipe_status_message'] = '';
+  try {
+    $variables['publications_url'] = Url::fromRoute('fresco_pages.publications')->toString();
+  }
+  catch (RouteNotFoundException) {
+    $variables['publications_url'] = '';
+  }
+
+  $node = $variables['node'];
+  $nutrition = (string) ($node->get('field_nutrition')->value ?? '');
+  if ($nutrition === '') {
+    $variables['nutrition_items'] = [];
+  }
+  else {
+    $decoded = json_decode($nutrition, TRUE);
+    if (!is_array($decoded)) {
+      $variables['nutrition_items'] = [];
+    }
+    else {
+      $items = [];
+      foreach ($decoded as $label => $value) {
+        $items[] = [
+          'label' => ucwords(str_replace('_', ' ', (string) $label)),
+          'value' => is_scalar($value) ? (string) $value : json_encode($value),
+        ];
+      }
+
+      $variables['nutrition_items'] = $items;
+    }
+  }
+
+  $fieldPublicUrl = trim((string) $node->get('field_pages_url')->value);
+  $entityTypeManager = \Drupal::entityTypeManager();
+  $ids = [];
+  $storage = NULL;
+  if ($entityTypeManager->hasDefinition('fresco_publication')) {
+    $storage = $entityTypeManager->getStorage('fresco_publication');
+    $ids = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('recipe', $node->id())
+      ->sort('created', 'DESC')
+      ->range(0, 1)
+      ->execute();
+  }
+  if ($ids !== []) {
+    $publication = $storage->load(reset($ids));
+    if ($publication instanceof Publication) {
+      $state = (string) $publication->get('state')->value;
+      $variables['public_recipe_state'] = $state;
+      $variables['public_recipe_status_message'] = fresco_theme_publication_status_message($state);
+      if ($state === 'published') {
+        $variables['public_recipe_url'] = trim((string) $publication->get('public_url')->value);
+      }
+    }
+  }
+  else {
+    $variables['public_recipe_state'] = $node->isPublished() ? 'published' : 'draft';
+    $variables['public_recipe_url'] = $fieldPublicUrl;
+  }
+
+  $variables['related_recipes'] = fresco_theme_related_recipes($node);
+  $variables['#cache']['tags'][] = 'node:' . $node->id();
+  $variables['#cache']['tags'][] = 'node_list:recipe';
+  $variables['#cache']['tags'][] = 'fresco_publication_list';
+  $variables['#cache']['contexts'][] = 'user.permissions';
+}
+
+/**
+ * Returns operator-facing copy for non-live publication states.
+ */
+function fresco_theme_publication_status_message(string $state): string {
+  return match ($state) {
+    'queued' => 'Queued for GitHub Pages. The public page is not live yet; run cron or process the Dresco Pages publication queue.',
+    'processing' => 'Publishing to GitHub Pages now. The public page is not live until this record finishes as published.',
+    'ready' => 'Publication is ready in preview transport only. It has not been pushed to GitHub Pages.',
+    'failed' => 'Publication failed. The public page was not updated; review the publication record and queue it again.',
+    'archived' => 'This recipe has been archived from GitHub Pages.',
+    default => '',
+  };
+}
+
+/**
+ * Finds similar published recipes for the current recipe page.
+ *
+ * @param \Drupal\node\NodeInterface $node
+ *   Current recipe node.
+ *
+ * @return array<int, array<string, mixed>>
+ *   Related recipe rows.
+ */
+function fresco_theme_related_recipes($node): array {
+  if ($node->bundle() !== 'recipe') {
+    return [];
+  }
+
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+  $query = $storage->getQuery()
+    ->accessCheck(TRUE)
+    ->condition('type', 'recipe')
+    ->condition('nid', $node->id(), '<>')
+    ->condition('status', 1)
+    ->sort('changed', 'DESC')
+    ->range(0, 3);
+
+  $conditions = $query->orConditionGroup()
+    ->condition('field_cuisine', (string) $node->get('field_cuisine')->value)
+    ->condition('field_category', (string) $node->get('field_category')->value);
+  $query->condition($conditions);
+
+  $rows = [];
+  foreach ($storage->loadMultiple($query->execute()) as $related) {
+    $rows[] = [
+      'title' => $related->label(),
+      'description' => (string) $related->get('field_recipe_description')->value,
+      'cuisine' => (string) $related->get('field_cuisine')->value,
+      'category' => (string) $related->get('field_category')->value,
+      'url' => Url::fromRoute('entity.node.canonical', ['node' => $related->id()])->toString(),
+      'image_url' => Url::fromRoute('fresco_recipe.image', ['node' => $related->id()])->toString(),
+    ];
+  }
+
+  return $rows;
+}

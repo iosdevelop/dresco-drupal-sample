@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Vegan Caribbean recipe bowl">
+  <rect width="1200" height="800" fill="#101414"/>
+  <circle cx="600" cy="420" r="250" fill="#f4f7f1"/>
+  <circle cx="600" cy="420" r="190" fill="#61d394"/>
+  <path d="M440 410c80-90 225-95 320 0 15 15 15 40 0 55-95 95-240 90-320 0-15-15-15-40 0-55z" fill="#f4c95d"/>
+  <circle cx="520" cy="390" r="32" fill="#7a3b24"/>
+  <circle cx="640" cy="360" r="28" fill="#7a3b24"/>
+  <circle cx="700" cy="455" r="24" fill="#7a3b24"/>
+  <path d="M385 650h430" stroke="#61d394" stroke-width="28" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,11 @@
+services:
+  fresco_migrate.commands:
+    class: Drupal\fresco_migrate\Drush\Commands\FrescoMigrateCommands
+    arguments:
+      - '@fresco_migrate.legacy_recipe_parity_reporter'
+      - '@fresco_migrate.legacy_recipe_image_migrator'
+      - '@fresco_migrate.legacy_recipe_import_runner'
+      - '@fresco_migrate.legacy_recipe_rehearsal_reporter'
+      - '@fresco_migrate.legacy_recipe_rollback_reporter'
+    tags:
+      - { name: drush.command }

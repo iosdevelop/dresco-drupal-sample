@@ -1,0 +1,15 @@
+fresco_ai.settings:
+  path: '/admin/config/fresco/ai'
+  defaults:
+    _form: '\Drupal\fresco_ai\Form\AiSettingsForm'
+    _title: 'Dresco AI settings'
+  requirements:
+    _permission: 'administer fresco ai'
+
+fresco_ai.ingredient_photo:
+  path: '/generator/photo'
+  defaults:
+    _form: '\Drupal\fresco_ai\Form\IngredientPhotoForm'
+    _title: 'Identify ingredients from a photo'
+  requirements:
+    _permission: 'generate fresco recipes'

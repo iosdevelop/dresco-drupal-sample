@@ -1,0 +1,61 @@
+<section class="fresco-page-head">
+  <div>
+    <p class="fresco-eyebrow">Kitchen console</p>
+    <h1>{{ 'Recipe dashboard'|t }}</h1>
+    <p>{{ 'Generate recipes, review appliance instructions, and prepare validated drafts for GitHub Pages.'|t }}</p>
+  </div>
+  <div class="fresco-hero-art">
+    {% if recipes %}
+      <img src="{{ recipes|first.image_url }}" alt="" width="1200" height="800">
+    {% endif %}
+    <a class="fresco-button" href="{{ path('fresco_recipe.generator') }}">{{ 'New recipe'|t }}</a>
+  </div>
+</section>
+
+<div class="fresco-metrics" aria-label="{{ 'Recipe summary'|t }}">
+  <div><strong>{{ recipe_count }}</strong><span>{{ 'Total recipes'|t }}</span></div>
+  <div><strong>5</strong><span>{{ 'Appliance profiles'|t }}</span></div>
+  <div><strong>4</strong><span>{{ 'Planned export formats'|t }}</span></div>
+</div>
+
+<section class="fresco-section">
+  <div class="fresco-section-head">
+    <h2>{{ 'Recent recipes'|t }}</h2>
+    <a href="{{ path('fresco_recipe.library') }}">{{ 'View library'|t }}</a>
+  </div>
+  {% if recipes %}
+    <div class="fresco-table-wrap">
+      <table>
+        <thead><tr><th>{{ 'Recipe'|t }}</th><th>{{ 'Cuisine'|t }}</th><th>{{ 'Status'|t }}</th><th>{{ 'Public URL'|t }}</th><th>{{ 'Updated'|t }}</th></tr></thead>
+        <tbody>
+        {% for recipe in recipes %}
+          <tr>
+            <td><a href="{{ recipe.url }}">{{ recipe.title }}</a></td>
+            <td>{{ recipe.cuisine }}</td>
+            <td><span class="fresco-pill">{{ recipe.status }}</span></td>
+            <td>
+              {% if recipe.public_url %}
+                <div class="fresco-actions">
+                  <button type="button" class="fresco-button fresco-button--secondary" data-fresco-copy-url="{{ recipe.public_url }}">{{ 'Copy'|t }}</button>
+                  <a class="fresco-button fresco-button--secondary" href="{{ recipe.public_url }}" target="_blank" rel="noopener">{{ 'Open'|t }}</a>
+                </div>
+              {% elseif recipe.public_message %}
+                <span class="fresco-meta">{{ recipe.public_message|t }}</span>
+              {% else %}
+                {{ 'Not published'|t }}
+              {% endif %}
+            </td>
+            <td>{{ recipe.changed }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="fresco-empty">
+      <h3>{{ 'Your kitchen is ready'|t }}</h3>
+      <p>{{ 'Generate the first recipe draft to begin building the Dresco library.'|t }}</p>
+      <a class="fresco-button" href="{{ path('fresco_recipe.generator') }}">{{ 'Generate first recipe'|t }}</a>
+    </div>
+  {% endif %}
+</section>
