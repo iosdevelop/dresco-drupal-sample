@@ -1,9 +1,9 @@
 {
-    "name": "iosdevelop/dresco-drupal-sample",
+    "name": "iosdevelop/dresco-drupal",
     "description": "Drupal 11 editorial and AI platform for Dresco recipes published to GitHub Pages.",
     "type": "project",
     "license": "GPL-2.0-or-later",
-    "homepage": "https://github.com/iosdevelop/dresco-drupal-sample",
+    "homepage": "https://github.com/iosdevelop/dresco-drupal",
     "support": {
         "docs": "https://www.drupal.org/docs/user_guide/en/index.html",
         "chat": "https://www.drupal.org/node/314178"
