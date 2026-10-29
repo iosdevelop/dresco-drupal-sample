@@ -179,3 +179,7 @@ ddev composer audit
 ```
 
 The complete extension plan and current implementation status, plus a change log of merged phases, are in [docs/dresco-drupal-extension-plan.md](docs/dresco-drupal-extension-plan.md).
+
+## License
+
+Code is licensed under the [GNU General Public License, version 2 or later](LICENSE.txt), like Drupal core. The Dresco name and logo are reserved, and recipes and artwork are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). See [NOTICE.md](NOTICE.md) for details.
