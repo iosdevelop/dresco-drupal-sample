@@ -6,6 +6,14 @@ Drupal 11 editorial, generation, validation, and publication platform for Dresco
 
 > Demo copy of a personal project, shared as a code sample. Where to look: `fresco_migrate` (Migrate API source plugin, a custom Drush command, parity/rehearsal/rollback reports with kernel tests), `fresco_recipe` (forms, validation rules, functional tests), `fresco_ai` (swappable LLM providers with a deterministic fallback, guardrails, queue-based generation), `fresco_theme`, and `.github/workflows/ci.yml` (phpcs, PHPStan, PHPUnit).
 
+## Use your own accounts
+
+Nothing in this repository connects to the author's accounts. To run it yourself:
+
+- **AI providers:** the deterministic provider works with no account. For OpenAI, export your own `OPENAI_API_KEY` before `ddev restart`; Ollama runs locally inside DDEV. Keys are read from the environment and never stored in Drupal configuration.
+- **Publishing:** create your own GitHub repository and GitHub App, then enter the repository owner and name at the Pages settings form and supply `FRESCO_GITHUB_APP_ID`, `FRESCO_GITHUB_INSTALLATION_ID`, and `FRESCO_GITHUB_APP_PRIVATE_KEY_B64` from your shell (see *GitHub Pages publication* below). Until then, publication stays in `preview` mode and writes nothing.
+- **Hosting:** the static bundle works on any static host (GitHub Pages, Cloudflare, Netlify). Set `site_url` to your own domain; access control for family recipes is up to your host.
+
 ## Local development
 
 ```bash

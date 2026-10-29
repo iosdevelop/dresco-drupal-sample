@@ -1,7 +1,7 @@
 transport: preview
 site_url: 'https://recipes.example.com'
-repository_owner: iosdevelop
-repository_name: dresco-recipes
+repository_owner: ''
+repository_name: ''
 branch: main
 github_app_id: ''
 github_installation_id: ''
